@@ -56,6 +56,11 @@ export const useInfinitePosts = (filters?: PostFilters, limit: number = 10) => {
     queryKey: postKeys.list(filters),
     queryFn: ({ pageParam = 1 }) => postService.listPosts(filters, { page: pageParam, limit }),
     getNextPageParam: (lastPage) => {
+      // Add safety check for undefined lastPage
+      if (!lastPage || typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
+        console.error('[useInfinitePosts] Invalid lastPage structure:', lastPage)
+        return undefined
+      }
       if (lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1
       }
@@ -272,6 +277,11 @@ export const useInfiniteSearchPosts = (
     queryFn: ({ pageParam = 1 }) =>
       postService.searchPosts(query, filters, { page: pageParam, limit }),
     getNextPageParam: (lastPage) => {
+      // Add safety check for undefined lastPage
+      if (!lastPage || typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
+        console.error('[useInfiniteSearchPosts] Invalid lastPage structure:', lastPage)
+        return undefined
+      }
       if (lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1
       }

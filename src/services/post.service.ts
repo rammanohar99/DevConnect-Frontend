@@ -65,6 +65,7 @@ export interface PaginatedPosts {
   total: number
   page: number
   totalPages: number
+  hasMore: boolean
 }
 
 export interface SearchFilters {
@@ -100,7 +101,10 @@ export const postService = {
       limit: pagination?.limit || 10,
     }
     const response = await api.get<{ status: string; data: PaginatedPosts }>('/posts', { params })
-    return response.data.data
+    // Backend returns { status, data: { posts, total, page, totalPages, hasMore } }
+    const result = response.data.data
+    console.log('[Post Service] listPosts response:', result)
+    return result
   },
 
   /**
@@ -169,6 +173,8 @@ export const postService = {
     const response = await api.get<{ status: string; data: PaginatedPosts }>('/posts/search', {
       params,
     })
-    return response.data.data
+    const result = response.data.data
+    console.log('[Post Service] searchPosts response:', result)
+    return result
   },
 }
