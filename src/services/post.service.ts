@@ -104,6 +104,19 @@ export const postService = {
     // Backend returns { status, data: { posts, total, page, totalPages, hasMore } }
     const result = response.data.data
     console.log('[Post Service] listPosts response:', result)
+    
+    // Validate response structure
+    if (!result || !Array.isArray(result.posts)) {
+      console.error('[Post Service] Invalid response structure:', result)
+      return {
+        posts: [],
+        total: 0,
+        page: 1,
+        totalPages: 0,
+        hasMore: false,
+      }
+    }
+    
     return result
   },
 
@@ -175,6 +188,19 @@ export const postService = {
     })
     const result = response.data.data
     console.log('[Post Service] searchPosts response:', result)
+    
+    // Validate response structure
+    if (!result || !Array.isArray(result.posts)) {
+      console.error('[Post Service] Invalid search response structure:', result)
+      return {
+        posts: [],
+        total: 0,
+        page: 1,
+        totalPages: 0,
+        hasMore: false,
+      }
+    }
+    
     return result
   },
 }

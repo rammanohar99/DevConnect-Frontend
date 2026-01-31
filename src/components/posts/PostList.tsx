@@ -57,7 +57,7 @@ export const PostList = ({ filters }: PostListProps) => {
     )
   }
 
-  const posts = data?.pages.flatMap((page) => page.posts) || []
+  const posts = data?.pages.flatMap((page) => page?.posts || []) || []
 
   if (posts.length === 0) {
     return (
