@@ -190,8 +190,16 @@ class SocketService {
    * Emit an event to the server
    */
   emit(event: string, data?: any): void {
-    if (!this.socket?.connected) {
-      console.warn(`[Socket] Cannot emit "${event}" - socket not connected`)
+    if (!this.socket) {
+      console.warn(`[Socket] Cannot emit "${event}" - socket not initialized`)
+      return
+    }
+
+    if (!this.socket.connected) {
+      // Queue the event to be sent once connected
+      this.socket.once('connect', () => {
+        this.socket?.emit(event, data)
+      })
       return
     }
 
@@ -247,13 +255,27 @@ class SocketService {
    * Join a room (for chat or notifications)
    */
   joinRoom(room: string): void {
-    // If it's a chat room, use join_chat event
-    if (room.startsWith('chat:')) {
-      const chatId = room.replace('chat:', '')
-      this.emit('join_chat', { chatId })
+    if (!this.socket) {
+      console.warn(`[Socket] Cannot join room "${room}" - socket not initialized`)
+      return
+    }
+
+    const joinFn = () => {
+      // If it's a chat room, use join_chat event
+      if (room.startsWith('chat:')) {
+        const chatId = room.replace('chat:', '')
+        this.emit('join_chat', { chatId })
+      } else {
+        // For other rooms (like user rooms), just join directly
+        this.emit('join_room', { room })
+      }
+    }
+
+    if (!this.socket.connected) {
+      // Wait for connection before joining
+      this.socket.once('connect', joinFn)
     } else {
-      // For other rooms (like user rooms), just join directly
-      this.emit('join_room', { room })
+      joinFn()
     }
   }
 

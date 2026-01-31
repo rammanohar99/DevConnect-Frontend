@@ -57,13 +57,22 @@ export const useInfinitePosts = (filters?: PostFilters, limit: number = 10) => {
     queryFn: ({ pageParam = 1 }) => postService.listPosts(filters, { page: pageParam, limit }),
     getNextPageParam: (lastPage) => {
       // Add safety check for undefined lastPage
-      if (!lastPage || typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
+      if (!lastPage) {
+        console.error('[useInfinitePosts] lastPage is undefined')
+        return undefined
+      }
+      
+      // Check if we have the expected structure
+      if (typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
         console.error('[useInfinitePosts] Invalid lastPage structure:', lastPage)
         return undefined
       }
-      if (lastPage.page < lastPage.totalPages) {
+      
+      // Check if there are more pages
+      if (lastPage.hasMore && lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1
       }
+      
       return undefined
     },
     initialPageParam: 1,
@@ -278,13 +287,22 @@ export const useInfiniteSearchPosts = (
       postService.searchPosts(query, filters, { page: pageParam, limit }),
     getNextPageParam: (lastPage) => {
       // Add safety check for undefined lastPage
-      if (!lastPage || typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
+      if (!lastPage) {
+        console.error('[useInfiniteSearchPosts] lastPage is undefined')
+        return undefined
+      }
+      
+      // Check if we have the expected structure
+      if (typeof lastPage.page !== 'number' || typeof lastPage.totalPages !== 'number') {
         console.error('[useInfiniteSearchPosts] Invalid lastPage structure:', lastPage)
         return undefined
       }
-      if (lastPage.page < lastPage.totalPages) {
+      
+      // Check if there are more pages
+      if (lastPage.hasMore && lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1
       }
+      
       return undefined
     },
     initialPageParam: 1,
