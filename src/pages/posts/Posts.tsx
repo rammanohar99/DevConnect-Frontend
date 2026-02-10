@@ -112,33 +112,34 @@ export const Posts = () => {
                 </div>
               )}
 
-              {searchResults.data && searchResults.data.pages && (
+              {searchResults.data?.pages && (
                 <div className="space-y-4">
-                  {searchResults.data.pages.flatMap((page) => page?.posts || []).length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">No posts found matching your search</p>
-                    </div>
-                  ) : (
-                    <>
-                      {searchResults.data.pages
-                        .flatMap((page) => page?.posts || [])
-                        .map((post) => (
+                  {(() => {
+                    const posts = searchResults.data.pages.flatMap((page) => page?.posts || [])
+                    return posts.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">No posts found matching your search</p>
+                      </div>
+                    ) : (
+                      <>
+                        {posts.map((post) => (
                           <PostCard key={post._id} post={post} />
                         ))}
 
-                      {searchResults.hasNextPage && (
-                        <div className="text-center py-4">
-                          <Button
-                            onClick={() => searchResults.fetchNextPage()}
-                            disabled={searchResults.isFetchingNextPage}
-                            variant="outline"
-                          >
-                            {searchResults.isFetchingNextPage ? 'Loading...' : 'Load More'}
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  )}
+                        {searchResults.hasNextPage && (
+                          <div className="text-center py-4">
+                            <Button
+                              onClick={() => searchResults.fetchNextPage()}
+                              disabled={searchResults.isFetchingNextPage}
+                              variant="outline"
+                            >
+                              {searchResults.isFetchingNextPage ? 'Loading...' : 'Load More'}
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
               )}
             </div>
